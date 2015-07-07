@@ -12,12 +12,17 @@ import redis.clients.jedis.JedisPool;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 @SpringBootApplication
 @RestController
@@ -31,31 +36,8 @@ public class Compass {
         SpringApplication.run(Compass.class, args);
     }
 
-    @RequestMapping(value = "/**", method = RequestMethod.GET)
-    void home(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        URL baseUrl = new URL(ConfigHelper.getConfigProperties().getProperty("BASEURL"));
-        String baseHostAndPort = baseUrl.getHost() + baseUrl.getPort();
-        String requestedHostAndPort = httpServletRequest.getRemoteHost() + httpServletRequest.getRemotePort();
-
-        if (!baseHostAndPort.equalsIgnoreCase(requestedHostAndPort)) {
-            String requestUrl = httpServletRequest.getRequestURL().toString();
-            Jedis redis = redisPool.getResource();
-            String redirectUrl = redis.get(requestUrl);
-            redisPool.returnResource(redis);
-
-            if (redirectUrl != null) {
-                httpServletResponse.setStatus(302);
-                httpServletResponse.setHeader("Location", redirectUrl);
-                log.info("Redirect: " + redirectUrl + " " + redirectUrl);
-            } else {
-                httpServletResponse.sendError(404, "Not found");
-            }
-        }
-
-    }
-
-    @RequestMapping(value = "/redirect/**", method = RequestMethod.GET)
-    void redirect(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    @RequestMapping(value = "/x/**", method = RequestMethod.GET)
+    void redirectShortLink(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Jedis redis = redisPool.getResource();
         String requestUri = httpServletRequest.getRequestURI();
         String redirectKey = requestUri.split("/")[2];
@@ -72,34 +54,58 @@ public class Compass {
         redisPool.returnResource(redis);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    void create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    @RequestMapping(value = "/rest/1.0/create", method = RequestMethod.POST)
+    String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Jedis redis = redisPool.getResource();
 
-        String src = httpServletRequest.getParameter("src");
         String dest = httpServletRequest.getParameter("dest");
-        if (src != null && dest != null) {
-            redis.set(src, dest);
-            log.info("Created: " + src + " " + dest);
+        String src = null;
+        if (dest != null) {
+            try {
+                // check if dest is a valid url
+                URL url = new URL(dest);
+
+                //create short link
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                md.reset();
+                md.update(dest.getBytes());
+                byte[] digest = md.digest();
+                BigInteger bigInteger = new BigInteger(1, digest);
+                String srcLong = bigInteger.toString(16);
+                //take only the first 8 chars
+                src = srcLong.substring(0, 8);
+
+                // set the short link and dest into db
+                redis.set(src, dest);
+                log.info("Created: " + src + " " + dest);
+
+            } catch (NoSuchAlgorithmException e) {
+                log.info("Could not find Algorithm " + e.getMessage());
+            } catch (MalformedURLException e) {
+                log.info("Could not create " + dest + ", message was " + e.getMessage());
+                httpServletResponse.sendError(400, "Bad request: " + e.getMessage());
+            } finally {
+                redisPool.returnResource(redis);
+            }
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
-        redisPool.returnResource(redis);
+        return src;
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/delete", method = RequestMethod.POST)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Jedis redis = redisPool.getResource();
         String src = httpServletRequest.getParameter("src");
         if (src != null) {
-           redis.del(src);
+            redis.del(src);
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
         redisPool.returnResource(redis);
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/list", method = RequestMethod.GET)
     Set<String> list() throws IOException {
         Jedis redis = redisPool.getResource();
 
@@ -108,7 +114,7 @@ public class Compass {
         return keys;
     }
 
-    @RequestMapping(value = "/dump", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/dump", method = RequestMethod.GET)
     void dump() throws IOException {
         Jedis redis = redisPool.getResource();
 
@@ -131,7 +137,7 @@ public class Compass {
 
     }
 
-    @RequestMapping(value = "/flushall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/flushall", method = RequestMethod.GET)
     void flushall() {
         Jedis redis = redisPool.getResource();
 

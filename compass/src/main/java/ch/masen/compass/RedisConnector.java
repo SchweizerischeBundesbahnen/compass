@@ -21,6 +21,7 @@ public class RedisConnector {
             pool = new JedisPool(new JedisPoolConfig(), redisHost);
 
             for (final String name : RedirectsHelper.getRedirects().stringPropertyNames()) {
+
                 Jedis redis = getPool().getResource();
                 redis.set(name, RedirectsHelper.getRedirects().getProperty(name));
                 pool.returnResource(redis);
