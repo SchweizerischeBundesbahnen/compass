@@ -105,7 +105,7 @@ public class RedirectDAO {
         Set<String> keys = redis.keys("*");
 
         for (String key : keys) {
-            if(!key.contains("RC")) {
+            if (!key.contains("RC")) {
                 redirects.add(getRedirect(key));
             }
         }
