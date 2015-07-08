@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,7 +30,6 @@ import java.util.logging.Logger;
 public class Compass {
 
     private Logger log = Logger.getLogger("ch.masen.compass.Compass");
-    private JedisPool redisPool = RedisConnector.getPool();
     private RedirectDAO rdao = new RedirectDAO();
 
     public static void main(String[] args) throws Exception {
@@ -38,28 +38,28 @@ public class Compass {
 
     @RequestMapping(value = "/x/**", method = RequestMethod.GET)
     void redirectShortLink(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        Jedis redis = redisPool.getResource();
+        Long startTime = System.currentTimeMillis();
         String requestUri = httpServletRequest.getRequestURI();
         String redirectKey = requestUri.split("/")[2];
-        String redirectUrl = redis.get(redirectKey);
+        RedirectDTO redirect = rdao.getRedirect(redirectKey);
+        String redirectUrl = redirect.getDestUrl().toString();
 
         if (redirectUrl != null) {
             httpServletResponse.setStatus(302);
             httpServletResponse.setHeader("Location", redirectUrl);
-            log.info("Redirect: " + redirectKey + " " + redirectUrl);
+            //rdao.incrementRedirectCounter(redirect);
+            log.info("Redirect: " + redirectKey + " " + redirectUrl + " took " + (System.currentTimeMillis()-startTime) + " ms");
         } else {
             httpServletResponse.sendError(404, "Not found");
         }
 
-        redisPool.returnResource(redis);
     }
 
     @RequestMapping(value = "/rest/1.0/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        Jedis redis = redisPool.getResource();
-
+        Long startTime = System.currentTimeMillis();
         String dest = httpServletRequest.getParameter("dest");
-        String src = null;
+        String id = null;
         if (dest != null) {
             try {
                 // check if dest is a valid url
@@ -71,70 +71,40 @@ public class Compass {
                 md.update(dest.getBytes());
                 byte[] digest = md.digest();
                 BigInteger bigInteger = new BigInteger(1, digest);
-                String srcLong = bigInteger.toString(16);
+                String idLong = bigInteger.toString(16);
                 //take only the first 8 chars
-                src = srcLong.substring(0, 8);
+                id = idLong.substring(0, 8);
 
                 // set the short link and dest into db
-                redis.set(src, dest);
-                log.info("Created: " + src + " " + dest);
+                RedirectDTO redirect = new RedirectDTO(id, new URL(dest));
+                rdao.addRedirect(redirect);
+                log.info("Created: " + redirect.getId() + " " + redirect.getDestUrl()+ " took " + (System.currentTimeMillis()-startTime) + " ms");
 
             } catch (NoSuchAlgorithmException e) {
                 log.info("Could not find Algorithm " + e.getMessage());
             } catch (MalformedURLException e) {
                 log.info("Could not create " + dest + ", message was " + e.getMessage());
                 httpServletResponse.sendError(400, "Bad request: " + e.getMessage());
-            } finally {
-                redisPool.returnResource(redis);
             }
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
-        return src;
+        return id;
     }
 
     @RequestMapping(value = "/rest/1.0/delete", method = RequestMethod.POST)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        Jedis redis = redisPool.getResource();
-        String src = httpServletRequest.getParameter("src");
-        if (src != null) {
-            redis.del(src);
+        String id = httpServletRequest.getParameter("id");
+        if (id != null) {
+            rdao.deleteRedirect(id);
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
-        redisPool.returnResource(redis);
     }
 
     @RequestMapping(value = "/rest/1.0/listall", method = RequestMethod.GET)
-    Set<String> listAll() throws IOException {
-        Jedis redis = redisPool.getResource();
-
-        Set<String> keys = redis.keys("*");
-        redisPool.returnResource(redis);
-        return keys;
-    }
-
-    @RequestMapping(value = "/rest/1.0/dump", method = RequestMethod.GET)
-    void dump() throws IOException {
-        Jedis redis = redisPool.getResource();
-
-        StringBuilder dbContent = new StringBuilder();
-
-        Set<String> keys = listAll();
-        Iterator<String> it = keys.iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            String value = redis.get(key);
-            dbContent.append(key + " = " + value + "\n");
-        }
-
-        Path redirectsFilePath = RedirectsHelper.getRedirectsFile().toPath();
-
-        Files.write(redirectsFilePath, dbContent.toString().getBytes());
-
-        log.info("Redis dumped to " + redirectsFilePath);
-        redisPool.returnResource(redis);
-
+    ArrayList<RedirectDTO> listAll() throws IOException {
+        return rdao.getAllRedirects();
     }
 
     @RequestMapping(value = "/rest/1.0/flushall", method = RequestMethod.GET)

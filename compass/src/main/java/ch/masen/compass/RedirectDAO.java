@@ -3,6 +3,8 @@ package ch.masen.compass;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,7 +31,7 @@ public class RedirectDAO {
             redisPool.returnResource(redis);
             throw new IllegalArgumentException("Redirect with key " + redirect.getId() + " already exists");
         } else {
-            redis.set(redirect.getId(), redirect.getDestUrl());
+            redis.set(redirect.getId(), redirect.getDestUrl().toString());
         }
 
         // add redirectCounter to database
@@ -61,6 +63,14 @@ public class RedirectDAO {
         redisPool.returnResource(redis);
     }
 
+    public void deleteRedirect(String id) {
+        Jedis redis = redisPool.getResource();
+        redis.del(id);
+        redis.del(REDIRECT_PREFIX+id);
+
+        redisPool.returnResource(redis);
+    }
+
     public RedirectDTO getRedirect(String key) {
         Jedis redis = redisPool.getResource();
         RedirectDTO redirect = null;
@@ -68,7 +78,11 @@ public class RedirectDAO {
         if (redis.get(key) != null) {
             redirect = new RedirectDTO();
             redirect.setId(key);
-            redirect.setDestUrl(redis.get(key));
+            try {
+                redirect.setDestUrl(new URL(redis.get(key)));
+            } catch (MalformedURLException e) {
+                log.info("Could not read destUrl from db " + e.getMessage());
+            }
         }
 
         redisPool.returnResource(redis);
