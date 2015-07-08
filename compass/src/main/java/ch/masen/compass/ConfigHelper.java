@@ -1,7 +1,5 @@
 package ch.masen.compass;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Properties;
 
 /**

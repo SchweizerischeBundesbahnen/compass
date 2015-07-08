@@ -22,7 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 @SpringBootApplication
 @RestController
@@ -31,6 +30,7 @@ public class Compass {
 
     private Logger log = Logger.getLogger("ch.masen.compass.Compass");
     private JedisPool redisPool = RedisConnector.getPool();
+    private RedirectDAO rdao = new RedirectDAO();
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Compass.class, args);
@@ -105,8 +105,8 @@ public class Compass {
         redisPool.returnResource(redis);
     }
 
-    @RequestMapping(value = "/rest/1.0/list", method = RequestMethod.GET)
-    Set<String> list() throws IOException {
+    @RequestMapping(value = "/rest/1.0/listall", method = RequestMethod.GET)
+    Set<String> listAll() throws IOException {
         Jedis redis = redisPool.getResource();
 
         Set<String> keys = redis.keys("*");
@@ -120,7 +120,7 @@ public class Compass {
 
         StringBuilder dbContent = new StringBuilder();
 
-        Set<String> keys = list();
+        Set<String> keys = listAll();
         Iterator<String> it = keys.iterator();
         while (it.hasNext()) {
             String key = it.next();
@@ -139,11 +139,7 @@ public class Compass {
 
     @RequestMapping(value = "/rest/1.0/flushall", method = RequestMethod.GET)
     void flushall() {
-        Jedis redis = redisPool.getResource();
-
-        redis.flushDB();
-        log.info("Database flushed");
-        redisPool.returnResource(redis);
+        rdao.flushDb();
     }
 
 }

@@ -14,7 +14,7 @@ public class RedisConnector {
     private static JedisPool pool;
 
     public static JedisPool getPool() {
-        if(pool != null) {
+        if (pool != null) {
             return pool;
         } else {
             String redisHost = ConfigHelper.getConfigProperties().getProperty("REDIS");
