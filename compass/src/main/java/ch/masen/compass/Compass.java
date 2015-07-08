@@ -6,8 +6,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,13 +13,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Logger;
 
 @SpringBootApplication
@@ -42,13 +36,13 @@ public class Compass {
         String requestUri = httpServletRequest.getRequestURI();
         String redirectKey = requestUri.split("/")[2];
         RedirectDTO redirect = rdao.getRedirect(redirectKey);
-        String redirectUrl = redirect.getDestUrl().toString();
 
-        if (redirectUrl != null) {
+        if (redirect != null) {
+            String redirectUrl = redirect.getDestUrl().toString();
             httpServletResponse.setStatus(302);
             httpServletResponse.setHeader("Location", redirectUrl);
-            //rdao.incrementRedirectCounter(redirect);
-            log.info("Redirect: " + redirectKey + " " + redirectUrl + " took " + (System.currentTimeMillis()-startTime) + " ms");
+            rdao.incrementRedirectCounter(redirect);
+            log.info("Redirect: " + redirectKey + " " + redirectUrl + " took " + (System.currentTimeMillis() - startTime) + " ms");
         } else {
             httpServletResponse.sendError(404, "Not found");
         }
@@ -78,7 +72,7 @@ public class Compass {
                 // set the short link and dest into db
                 RedirectDTO redirect = new RedirectDTO(id, new URL(dest));
                 rdao.addRedirect(redirect);
-                log.info("Created: " + redirect.getId() + " " + redirect.getDestUrl()+ " took " + (System.currentTimeMillis()-startTime) + " ms");
+                log.info("Created: " + redirect.getId() + " " + redirect.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
 
             } catch (NoSuchAlgorithmException e) {
                 log.info("Could not find Algorithm " + e.getMessage());
@@ -102,8 +96,8 @@ public class Compass {
         }
     }
 
-    @RequestMapping(value = "/rest/1.0/listall", method = RequestMethod.GET)
-    ArrayList<RedirectDTO> listAll() throws IOException {
+    @RequestMapping(value = "/rest/1.0/getall", method = RequestMethod.GET)
+    ArrayList<RedirectDTO> getAll() throws IOException {
         return rdao.getAllRedirects();
     }
 
@@ -111,5 +105,4 @@ public class Compass {
     void flushall() {
         rdao.flushDb();
     }
-
 }

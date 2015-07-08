@@ -16,8 +16,8 @@ public class RedirectDTO {
     }
 
     public RedirectDTO(String id, URL destUrl) {
-        this.id=id;
-        this.destUrl=destUrl;
+        this.id = id;
+        this.destUrl = destUrl;
     }
 
     public String getId() {

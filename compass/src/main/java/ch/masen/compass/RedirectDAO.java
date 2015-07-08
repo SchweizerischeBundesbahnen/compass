@@ -48,6 +48,14 @@ public class RedirectDAO {
 
     }
 
+    public Integer getRedirectCounter(RedirectDTO redirect) {
+        Jedis redis = redisPool.getResource();
+        Integer count = Integer.valueOf(redis.get(REDIRECT_PREFIX + redirect.getId()));
+
+        redisPool.returnResource(redis);
+        return count;
+    }
+
     public void incrementRedirectCounter(RedirectDTO redirect) {
         Jedis redis = redisPool.getResource();
         redis.incr(REDIRECT_PREFIX + redirect.getId());
@@ -66,7 +74,7 @@ public class RedirectDAO {
     public void deleteRedirect(String id) {
         Jedis redis = redisPool.getResource();
         redis.del(id);
-        redis.del(REDIRECT_PREFIX+id);
+        redis.del(REDIRECT_PREFIX + id);
 
         redisPool.returnResource(redis);
     }
@@ -78,6 +86,7 @@ public class RedirectDAO {
         if (redis.get(key) != null) {
             redirect = new RedirectDTO();
             redirect.setId(key);
+            redirect.setRedirectCount(getRedirectCounter(redirect));
             try {
                 redirect.setDestUrl(new URL(redis.get(key)));
             } catch (MalformedURLException e) {
@@ -96,7 +105,9 @@ public class RedirectDAO {
         Set<String> keys = redis.keys("*");
 
         for (String key : keys) {
-            redirects.add(getRedirect(key));
+            if(!key.contains("RC")) {
+                redirects.add(getRedirect(key));
+            }
         }
 
         redisPool.returnResource(redis);

@@ -1,7 +1,6 @@
 package ch.masen.compass;
 
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -15,17 +14,13 @@ public class RedisConnector {
 
     public static JedisPool getPool() {
         if (pool != null) {
+
             return pool;
         } else {
             String redisHost = ConfigHelper.getConfigProperties().getProperty("REDIS");
-            pool = new JedisPool(new JedisPoolConfig(), redisHost);
-
-            for (final String name : RedirectsHelper.getRedirects().stringPropertyNames()) {
-
-                Jedis redis = getPool().getResource();
-                redis.set(name, RedirectsHelper.getRedirects().getProperty(name));
-                pool.returnResource(redis);
-            }
+            JedisPoolConfig config = new JedisPoolConfig();
+            config.setMaxTotal(100);
+            pool = new JedisPool(config, redisHost);
 
             return pool;
         }
