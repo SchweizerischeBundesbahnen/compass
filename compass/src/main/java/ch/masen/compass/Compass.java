@@ -1,5 +1,6 @@
 package ch.masen.compass;
 
+import com.google.gson.Gson;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 @SpringBootApplication
@@ -25,6 +25,7 @@ public class Compass {
 
     private Logger log = Logger.getLogger("ch.masen.compass.Compass");
     private RedirectDAO rdao = new RedirectDAO();
+    private Gson gson = new Gson();
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Compass.class, args);
@@ -49,11 +50,13 @@ public class Compass {
 
     }
 
-    @RequestMapping(value = "/rest/1.0/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/shortlink/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Long startTime = System.currentTimeMillis();
         String dest = httpServletRequest.getParameter("dest");
         String id = null;
+        RedirectDTO redirect = null;
+
         if (dest != null) {
             try {
                 // check if dest is a valid url
@@ -70,9 +73,14 @@ public class Compass {
                 id = idLong.substring(0, 8);
 
                 // set the short link and dest into db
-                RedirectDTO redirect = new RedirectDTO(id, new URL(dest));
+                redirect = new RedirectDTO(id, new URL(dest));
                 rdao.addRedirect(redirect);
                 log.info("Created: " + redirect.getId() + " " + redirect.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
+
+            } catch (IllegalArgumentException e) {
+                if (e.getMessage().contains("already exists")) {
+                    log.info(e.getMessage());
+                }
 
             } catch (NoSuchAlgorithmException e) {
                 log.info("Could not find Algorithm " + e.getMessage());
@@ -83,10 +91,12 @@ public class Compass {
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
-        return id;
+        String json = gson.toJson(redirect);
+
+        return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.POST)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String id = httpServletRequest.getParameter("id");
         if (id != null) {
@@ -96,12 +106,14 @@ public class Compass {
         }
     }
 
-    @RequestMapping(value = "/rest/1.0/getall", method = RequestMethod.GET)
-    ArrayList<RedirectDTO> getAll() throws IOException {
-        return rdao.getAllRedirects();
+    @RequestMapping(value = "/rest/1.0/shortlink/getall", method = RequestMethod.GET)
+    String getAll() throws IOException {
+        String json = gson.toJson(rdao.getAllRedirects());
+
+        return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/flushall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/shortlink/flushall", method = RequestMethod.GET)
     void flushall() {
         rdao.flushDb();
     }
