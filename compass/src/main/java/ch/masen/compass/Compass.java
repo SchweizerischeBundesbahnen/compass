@@ -50,7 +50,7 @@ public class Compass {
 
     }
 
-    @RequestMapping(value = "/rest/1.0/shortlink/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/redirect/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Long startTime = System.currentTimeMillis();
         String dest = httpServletRequest.getParameter("dest");
@@ -96,7 +96,7 @@ public class Compass {
         return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/redirect/delete", method = RequestMethod.POST)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String id = httpServletRequest.getParameter("id");
         if (id != null) {
@@ -106,14 +106,14 @@ public class Compass {
         }
     }
 
-    @RequestMapping(value = "/rest/1.0/shortlink/getall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/redirect/getall", method = RequestMethod.GET)
     String getAll() throws IOException {
         String json = gson.toJson(rdao.getAllRedirects());
 
         return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/shortlink/flushall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/redirect/flushall", method = RequestMethod.GET)
     void flushall() {
         rdao.flushDb();
     }

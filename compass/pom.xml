@@ -54,5 +54,19 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>masen</id>
+            <name>Masen Releases</name>
+            <url>http://repo.masen.ch/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>masen</id>
+            <name>Masen Snapshots</name>
+            <url>http://repo.masen.ch/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
