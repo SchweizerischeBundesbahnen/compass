@@ -31,6 +31,7 @@ public class Compass {
         SpringApplication.run(Compass.class, args);
     }
 
+    // Redirect shortlinks
     @RequestMapping(value = "/x/**", method = RequestMethod.GET)
     void redirectShortLink(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Long startTime = System.currentTimeMillis();
