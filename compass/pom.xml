@@ -4,7 +4,7 @@
 
     <groupId>ch.masen</groupId>
     <artifactId>compass</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6-SNAPSHOT</version>
 
     <!-- Inherit defaults from Spring Boot -->
     <parent>
