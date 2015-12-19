@@ -2,7 +2,7 @@ image: java
 
 job:
   script:
-  - mvnw clean test
+  - mvnw clean install
 
  trigger:
    type: deploy
