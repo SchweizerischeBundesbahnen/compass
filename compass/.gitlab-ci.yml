@@ -3,3 +3,8 @@ image: java
 job:
   script:
   - mvnw clean install
+
+ trigger:
+   type: deploy
+   script:
+     - "curl -X POST -F token=TOKEN http://code.masen.ch/ci/api/v1/projects/8/refs/REF_NAME/trigger"
