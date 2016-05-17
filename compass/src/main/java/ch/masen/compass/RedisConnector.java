@@ -22,8 +22,7 @@ public class RedisConnector {
 
             return pool;
         } else {
-            String redisHost = ConfigHelper.getConfigProperties().getProperty("REDIS");
-            //String redisHost = "localhost";
+            String redisHost = System.getenv("REDIS";
             if(redisHost != null) {
                 JedisPoolConfig config = new JedisPoolConfig();
                 config.setMaxTotal(100);
