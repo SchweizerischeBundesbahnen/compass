@@ -1,7 +1,6 @@
 # compass - Backend for managing Short-Links
 
 ## How to run
-
 Use this docker-compose.yml
 
 <pre><code>
