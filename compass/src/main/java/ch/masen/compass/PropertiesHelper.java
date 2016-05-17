@@ -31,7 +31,7 @@ public class PropertiesHelper {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
-            log.info("Could not find property file " + systemPropertyString);
+            log.warning("Could not find property file " + systemProperty);
         }
     }
 
