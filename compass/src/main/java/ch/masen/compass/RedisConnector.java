@@ -22,7 +22,7 @@ public class RedisConnector {
 
             return pool;
         } else {
-            String redisHost = System.getenv("REDIS";
+            String redisHost = System.getenv("REDIS");
             if(redisHost != null) {
                 JedisPoolConfig config = new JedisPoolConfig();
                 config.setMaxTotal(100);
