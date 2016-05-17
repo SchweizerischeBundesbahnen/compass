@@ -3,8 +3,7 @@
 ## How to run
 Use this docker-compose.yml
 
-<pre><code>
-compass:
+<pre><code>compass:
   image: imasen/compass
   ports:
     - "8080:8080"
@@ -16,5 +15,4 @@ compass:
 
 redis:
   image: redis
-  restart: always
-</pre></code>
+  restart: always</pre></code>
