@@ -4,6 +4,7 @@
 
 Use this docker-compose.yml
 
+<pre><code>
 compass:
   image: imasen/compass
   ports:
@@ -17,3 +18,4 @@ compass:
 redis:
   image: redis
   restart: always
+</pre></code>
