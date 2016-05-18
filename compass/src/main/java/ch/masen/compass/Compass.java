@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,10 +27,64 @@ public class Compass {
 
     private Logger log = Logger.getLogger("ch.masen.compass.Compass");
     private ShortLinkDAO shortLinkDAO = new ShortLinkDAO();
+    private SubdomainRedirectDAO subdomainRedirectDAO = new SubdomainRedirectDAO();
     private Gson gson = new Gson();
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Compass.class, args);
+    }
+
+    // Redirect Domain
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    void redirectSubdomain(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, URISyntaxException {
+        Long startTime = System.currentTimeMillis();
+        URI requestUri = new URI(httpServletRequest.getRequestURI());
+        String domain = requestUri.getHost();
+        SubdomainRedirectDTO redirect = subdomainRedirectDAO.getRedirect(domain);
+
+        if(redirect != null) {
+            String redirectUrl = String.valueOf(redirect.getDestUrl());
+            httpServletResponse.setStatus(302);
+            httpServletResponse.setHeader("Location", redirectUrl);
+            subdomainRedirectDAO.incrementRedirectCounter(redirect);
+            log.info("Subdomain Redirect: " + domain + " " + redirectUrl + " took " + (System.currentTimeMillis() - startTime) + " ms");
+        } else {
+            httpServletResponse.sendError(404, "Not found");
+        }
+
+    }
+
+    @RequestMapping(value = "/rest/1.0/subdomainredirect/create", method = RequestMethod.POST)
+    String createDomainRedirect(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        Long startTime = System.currentTimeMillis();
+        String src = httpServletRequest.getParameter("src");
+        String dest = httpServletRequest.getParameter("dest");
+        SubdomainRedirectDTO subdomainRedirect = null;
+
+        if (dest != null && src != null) {
+            try {
+                // check if dest/src is a valid url
+                URL destUrl = new URL(dest);
+                URL srcUrl = new URL(src);
+                subdomainRedirect = new SubdomainRedirectDTO(srcUrl, destUrl);
+                subdomainRedirectDAO.addShortLink(subdomainRedirect);
+                log.info("Created: " + subdomainRedirect.getSrcUrl() + " " + subdomainRedirect.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
+
+            } catch (IllegalArgumentException e) {
+                if (e.getMessage().contains("already exists")) {
+                    log.info(e.getMessage());
+                }
+
+            } catch (MalformedURLException e) {
+                log.info("Could not create " + dest + ", message was " + e.getMessage());
+                httpServletResponse.sendError(400, "Bad request: " + e.getMessage());
+            }
+        } else {
+            httpServletResponse.sendError(400, "Bad request");
+        }
+        String json = gson.toJson(subdomainRedirect);
+
+        return json;
     }
 
     // Redirect shortlinks
