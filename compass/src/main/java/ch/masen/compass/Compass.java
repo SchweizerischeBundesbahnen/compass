@@ -114,8 +114,10 @@ public class Compass {
         return json;
     }
 
+    /**
     @RequestMapping(value = "/rest/1.0/redirect/flushall", method = RequestMethod.GET)
     void flushall() {
         rdao.flushDb();
     }
+    **/
 }
