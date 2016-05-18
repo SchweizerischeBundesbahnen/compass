@@ -5,17 +5,17 @@ import java.net.URL;
 /**
  * Created by igor on 08.07.15.
  */
-public class RedirectDTO {
+public class ShortLinkDTO {
 
     private String id;
     private URL destUrl;
     private int redirectCount;
 
-    public RedirectDTO() {
+    public ShortLinkDTO() {
 
     }
 
-    public RedirectDTO(String id, URL destUrl) {
+    public ShortLinkDTO(String id, URL destUrl) {
         this.id = id;
         this.destUrl = destUrl;
     }
@@ -46,7 +46,7 @@ public class RedirectDTO {
 
     @Override
     public String toString() {
-        return "RedirectDTO{" +
+        return "ShortLinkDTO{" +
                 "id='" + id + '\'' +
                 ", destUrl='" + destUrl + '\'' +
                 ", redirectCount=" + redirectCount +

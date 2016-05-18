@@ -12,34 +12,34 @@ import java.util.logging.Logger;
 /**
  * Created by igor on 08.07.15.
  */
-public class RedirectDAO {
+public class ShortLinkDAO {
 
-    private ArrayList<RedirectDTO> redirects;
-    private Logger log = Logger.getLogger("ch.masen.compass.RedirectDAO");
+    private ArrayList<ShortLinkDTO> shortLinks;
+    private Logger log = Logger.getLogger("ch.masen.compass.ShortLinkDAO");
     private JedisPool redisPool;
-    private String REDIRECT_PREFIX = "RC.";
+    private String SHORTLINK_PREFIX = "RC.";
 
-    public RedirectDAO() {
+    public ShortLinkDAO() {
         redisPool = RedisConnector.getPool();
     }
 
-    public void addRedirect(RedirectDTO redirect) {
+    public void addShortLink(ShortLinkDTO shortLink) {
         Jedis redis = redisPool.getResource();
 
-        // add new redirect to database
-        if (redis.get(redirect.getId()) != null) {
+        // add new shortLink to database
+        if (redis.get(shortLink.getId()) != null) {
             redisPool.returnResource(redis);
-            throw new IllegalArgumentException("Redirect with key " + redirect.getId() + " already exists");
+            throw new IllegalArgumentException("ShortLink with key " + shortLink.getId() + " already exists");
         } else {
-            redis.set(redirect.getId(), redirect.getDestUrl().toString());
+            redis.set(shortLink.getId(), shortLink.getDestUrl().toString());
         }
 
         // add redirectCounter to database
-        String rcKey = REDIRECT_PREFIX + redirect.getId();
+        String rcKey = SHORTLINK_PREFIX + shortLink.getId();
 
         if (redis.get(rcKey) != null) {
             redisPool.returnResource(redis);
-            throw new IllegalArgumentException("Redirect counter with key " + redirect.getId() + " already exists");
+            throw new IllegalArgumentException("ShortLink counter with key " + shortLink.getId() + " already exists");
         } else {
             redis.set(rcKey, "0");
         }
@@ -48,70 +48,70 @@ public class RedirectDAO {
 
     }
 
-    public Integer getRedirectCounter(RedirectDTO redirect) {
+    public Integer getRedirectCounter(ShortLinkDTO shortLink) {
         Jedis redis = redisPool.getResource();
-        Integer count = Integer.valueOf(redis.get(REDIRECT_PREFIX + redirect.getId()));
+        Integer count = Integer.valueOf(redis.get(SHORTLINK_PREFIX + shortLink.getId()));
 
         redisPool.returnResource(redis);
         return count;
     }
 
-    public void incrementRedirectCounter(RedirectDTO redirect) {
+    public void incrementRedirectCounter(ShortLinkDTO shortLink) {
         Jedis redis = redisPool.getResource();
-        redis.incr(REDIRECT_PREFIX + redirect.getId());
+        redis.incr(SHORTLINK_PREFIX + shortLink.getId());
 
         redisPool.returnResource(redis);
     }
 
-    public void deleteRedirect(RedirectDTO redirect) {
+    public void deleteShortLink(ShortLinkDTO shortLink) {
         Jedis redis = redisPool.getResource();
-        redis.del(redirect.getId());
-        redis.del(REDIRECT_PREFIX + redirect.getId());
+        redis.del(shortLink.getId());
+        redis.del(SHORTLINK_PREFIX + shortLink.getId());
 
         redisPool.returnResource(redis);
     }
 
-    public void deleteRedirect(String id) {
+    public void deleteShortLink(String id) {
         Jedis redis = redisPool.getResource();
         redis.del(id);
-        redis.del(REDIRECT_PREFIX + id);
+        redis.del(SHORTLINK_PREFIX + id);
 
         redisPool.returnResource(redis);
     }
 
-    public RedirectDTO getRedirect(String key) {
+    public ShortLinkDTO getShortLink(String key) {
         Jedis redis = redisPool.getResource();
-        RedirectDTO redirect = null;
+        ShortLinkDTO shortLink = null;
 
         if (redis.get(key) != null) {
-            redirect = new RedirectDTO();
-            redirect.setId(key);
-            redirect.setRedirectCount(getRedirectCounter(redirect));
+            shortLink = new ShortLinkDTO();
+            shortLink.setId(key);
+            shortLink.setRedirectCount(getRedirectCounter(shortLink));
             try {
-                redirect.setDestUrl(new URL(redis.get(key)));
+                shortLink.setDestUrl(new URL(redis.get(key)));
             } catch (MalformedURLException e) {
                 log.info("Could not read destUrl from db " + e.getMessage());
             }
         }
 
         redisPool.returnResource(redis);
-        return redirect;
+        return shortLink;
     }
 
-    public ArrayList<RedirectDTO> getAllRedirects() {
-        redirects = new ArrayList<RedirectDTO>();
+    public ArrayList<ShortLinkDTO> getAllShortLinks() {
+        shortLinks = new ArrayList<ShortLinkDTO>();
         Jedis redis = redisPool.getResource();
 
         Set<String> keys = redis.keys("*");
 
         for (String key : keys) {
             if (!key.contains("RC")) {
-                redirects.add(getRedirect(key));
+                shortLinks.add(getShortLink(key));
             }
         }
 
         redisPool.returnResource(redis);
-        return redirects;
+        return shortLinks;
     }
 
     public void flushDb() {

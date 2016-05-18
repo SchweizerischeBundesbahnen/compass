@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class Compass {
 
     private Logger log = Logger.getLogger("ch.masen.compass.Compass");
-    private RedirectDAO rdao = new RedirectDAO();
+    private ShortLinkDAO shortLinkDAO = new ShortLinkDAO();
     private Gson gson = new Gson();
 
     public static void main(String[] args) throws Exception {
@@ -37,13 +37,13 @@ public class Compass {
         Long startTime = System.currentTimeMillis();
         String requestUri = httpServletRequest.getRequestURI();
         String redirectKey = requestUri.split("/")[2];
-        RedirectDTO redirect = rdao.getRedirect(redirectKey);
+        ShortLinkDTO redirect = shortLinkDAO.getShortLink(redirectKey);
 
         if (redirect != null) {
             String redirectUrl = redirect.getDestUrl().toString();
             httpServletResponse.setStatus(302);
             httpServletResponse.setHeader("Location", redirectUrl);
-            rdao.incrementRedirectCounter(redirect);
+            shortLinkDAO.incrementRedirectCounter(redirect);
             log.info("Redirect: " + redirectKey + " " + redirectUrl + " took " + (System.currentTimeMillis() - startTime) + " ms");
         } else {
             httpServletResponse.sendError(404, "Not found");
@@ -51,12 +51,12 @@ public class Compass {
 
     }
 
-    @RequestMapping(value = "/rest/1.0/redirect/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/shortlink/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Long startTime = System.currentTimeMillis();
         String dest = httpServletRequest.getParameter("dest");
         String id = null;
-        RedirectDTO redirect = null;
+        ShortLinkDTO shortLink = null;
 
         if (dest != null) {
             try {
@@ -74,9 +74,9 @@ public class Compass {
                 id = idLong.substring(0, 8);
 
                 // set the short link and dest into db
-                redirect = new RedirectDTO(id, new URL(dest));
-                rdao.addRedirect(redirect);
-                log.info("Created: " + redirect.getId() + " " + redirect.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
+                shortLink = new ShortLinkDTO(id, new URL(dest));
+                shortLinkDAO.addShortLink(shortLink);
+                log.info("Created: " + shortLink.getId() + " " + shortLink.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
 
             } catch (IllegalArgumentException e) {
                 if (e.getMessage().contains("already exists")) {
@@ -92,32 +92,32 @@ public class Compass {
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
-        String json = gson.toJson(redirect);
+        String json = gson.toJson(shortLink);
 
         return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/redirect/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.POST)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String id = httpServletRequest.getParameter("id");
         if (id != null) {
-            rdao.deleteRedirect(id);
+            shortLinkDAO.deleteShortLink(id);
         } else {
             httpServletResponse.sendError(400, "Bad request");
         }
     }
 
-    @RequestMapping(value = "/rest/1.0/redirect/getall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/shortlink/getall", method = RequestMethod.GET)
     String getAll() throws IOException {
-        String json = gson.toJson(rdao.getAllRedirects());
+        String json = gson.toJson(shortLinkDAO.getAllShortLinks());
 
         return json;
     }
 
     /**
-    @RequestMapping(value = "/rest/1.0/redirect/flushall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/shortlink/flushall", method = RequestMethod.GET)
     void flushall() {
-        rdao.flushDb();
+        shortLinkDAO.flushDb();
     }
     **/
 }
