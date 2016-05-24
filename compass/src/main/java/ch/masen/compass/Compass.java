@@ -34,7 +34,7 @@ public class Compass {
         SpringApplication.run(Compass.class, args);
     }
 
-    /** // Redirect Domain
+    // Redirect Domain
     @RequestMapping(value = "/", method = RequestMethod.GET)
     void redirectSubdomain(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, URISyntaxException {
         Long startTime = System.currentTimeMillis();
@@ -52,7 +52,7 @@ public class Compass {
             httpServletResponse.sendError(404, "Not found");
         }
 
-    } **/
+    }
 
     @RequestMapping(value = "/rest/1.0/subdomainredirect/create", method = RequestMethod.POST)
     String createDomainRedirect(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
