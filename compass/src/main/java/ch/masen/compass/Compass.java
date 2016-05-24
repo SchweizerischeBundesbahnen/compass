@@ -153,7 +153,7 @@ public class Compass {
         return json;
     }
 
-    @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.DELETE)
     void delete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String id = httpServletRequest.getParameter("id");
         if (id != null) {
@@ -171,7 +171,7 @@ public class Compass {
     }
 
     /**
-    @RequestMapping(value = "/rest/1.0/shortlink/flushall", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/1.0/shortlink/flushall", method = RequestMethod.POST)
     void flushall() {
         shortLinkDAO.flushDb();
     }
