@@ -1,6 +1,7 @@
 # compass - Backend for managing Short-Links
 
-## How to run
+How to run
+----------
 Use this docker-compose.yml
 
 <pre><code>compass:
@@ -15,7 +16,7 @@ Use this docker-compose.yml
 
 redis:
   image: redis
-  restart: always</pre></code>
+  restart: always</code></pre>
 
 ## Create Shortlink
 <pre><code>curl -X POST http://localhost:8080/rest/1.0/shortlink/create?dest=http://example.com</code></pre>
