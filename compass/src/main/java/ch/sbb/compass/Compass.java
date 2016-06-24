@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,7 @@ public class Compass {
 
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/rest/1.0/shortlink/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Long startTime = System.currentTimeMillis();

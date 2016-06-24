@@ -2,20 +2,14 @@ package ch.sbb.compass;
 
 import java.net.URL;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Created by igor on 08.07.15.
  */
-@Component
 public class ShortLinkDTO {
 
     private String id;
     private URL destUrl;
     private int redirectCount;
-
-    public ShortLinkDTO() { // Spring constructor
-    }
 
     public ShortLinkDTO(String id, URL destUrl) {
         this.id = id;
