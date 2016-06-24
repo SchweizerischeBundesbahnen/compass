@@ -1,12 +1,14 @@
 package ch.sbb.compass.rest.controller;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,7 @@ import ch.sbb.compass.redis.ShortLinkDAO;
  */
 @RestController
 public class DeleteShortLinkController {
+    private static final Logger LOG = Logger.getLogger(DeleteShortLinkController.class.getSimpleName());
 
     @Autowired
     private ShortLinkDAO shortLinkDAO;
@@ -33,6 +36,7 @@ public class DeleteShortLinkController {
      * @param httpServletRequest The request object containing the required parameters
      * @param httpServletResponse The response object to use when an unexpected situation occurs
      */
+    @CrossOrigin
     @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.DELETE)
     void delete(HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException {
@@ -42,6 +46,7 @@ public class DeleteShortLinkController {
             httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             shortLinkDAO.deleteShortLink(id);
+            LOG.info("Deleted: " + id);
         }
     }
 }
