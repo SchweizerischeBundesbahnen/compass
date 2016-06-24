@@ -86,7 +86,13 @@ public class Compass {
 
             } catch (IllegalArgumentException e) {
                 if (e.getMessage().contains("already exists")) {
-                    log.info(e.getMessage());
+                    if(shortLink.getId().equals(shortLinkDAO.getShortLink(shortLink.getId()).getId())) {
+                        log.info(e.getMessage() + " " + shortLink.getDestUrl() + " took " + (System.currentTimeMillis() - startTime) + " ms");
+                    } else {
+                        log.warning(e.getMessage() + " collision for key " + shortLink.getId() +
+                                ". RedirectLink " + shortLink.getDestUrl() + " is not equal " +
+                                shortLinkDAO.getShortLink(shortLink.getId()).getDestUrl());
+                    }
                 }
 
             } catch (NoSuchAlgorithmException e) {
