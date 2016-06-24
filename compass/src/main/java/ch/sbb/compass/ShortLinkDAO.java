@@ -1,8 +1,11 @@
 package ch.sbb.compass;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import javax.annotation.PostConstruct;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,6 +15,7 @@ import java.util.logging.Logger;
 /**
  * Created by igor on 08.07.15.
  */
+@Component
 public class ShortLinkDAO {
 
     private ArrayList<ShortLinkDTO> shortLinks;
@@ -19,9 +23,8 @@ public class ShortLinkDAO {
     private JedisPool redisPool;
     private String SHORTLINK_PREFIX = "RC.";
 
-    public ShortLinkDAO() {
-        redisPool = RedisConnector.getPool();
-    }
+    @Autowired
+    private RedisConnector redisConnector;
 
     public void addShortLink(ShortLinkDTO shortLink) {
         Jedis redis = redisPool.getResource();
@@ -84,13 +87,11 @@ public class ShortLinkDAO {
         ShortLinkDTO shortLink = null;
 
         if (redis.get(key) != null) {
-            shortLink = new ShortLinkDTO();
-            shortLink.setId(key);
-            shortLink.setRedirectCount(getRedirectCounter(shortLink));
             try {
-                shortLink.setDestUrl(new URL(redis.get(key)));
+                shortLink = new ShortLinkDTO(key, new URL(redis.get(key)));
+                shortLink.setRedirectCount(getRedirectCounter(shortLink));
             } catch (MalformedURLException e) {
-                log.info("Could not read destUrl from db " + e.getMessage());
+                log.warning("Could not read destUrl from db " + e.getMessage());
             }
         }
 
@@ -123,4 +124,8 @@ public class ShortLinkDAO {
         redisPool.returnResource(redis);
     }
 
+    @PostConstruct
+    private void init() {
+        redisPool = redisConnector.getPool();
+    }
 }
