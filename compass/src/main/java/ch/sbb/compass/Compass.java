@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import com.google.gson.Gson;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 @EnableScheduling
 public class Compass {
 
-    private Logger log = Logger.getLogger("ch.masen.compass.Compass");
+    private Logger log = Logger.getLogger("Compass");
     private ShortLinkDAO shortLinkDAO = new ShortLinkDAO();
     private SubdomainRedirectDAO subdomainRedirectDAO = new SubdomainRedirectDAO();
     private Gson gson = new Gson();

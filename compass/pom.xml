@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.masen</groupId>
+    <groupId>ch.sbb</groupId>
     <artifactId>compass</artifactId>
     <version>0.0.8-SNAPSHOT</version>
 
@@ -70,15 +70,15 @@
     <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
-            <id>masen</id>
-            <name>Masen Releases</name>
-            <url>http://repo.masen.ch/content/repositories/releases/</url>
+            <id>hosted.mwe-wzu.releases</id>
+            <name>Compass Releases</name>
+            <url>http://repo.sbb.ch/content/repositories/hosted.mwe-wzu.releases/</url>
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
-            <id>masen</id>
-            <name>Masen Snapshots</name>
-            <url>http://repo.masen.ch/content/repositories/snapshots/</url>
+            <id>hosted.mwe-wzu.releases</id>
+            <name>Compass Snapshots</name>
+            <url>http://repo.sbb.ch/content/repositories/hosted.mwe-wzu.snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

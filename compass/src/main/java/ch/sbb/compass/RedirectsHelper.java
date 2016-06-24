@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import java.io.File;
 import java.util.Properties;

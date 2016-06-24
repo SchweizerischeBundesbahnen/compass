@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import java.net.URL;
 

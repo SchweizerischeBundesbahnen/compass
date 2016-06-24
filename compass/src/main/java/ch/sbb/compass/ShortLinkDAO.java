@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class ShortLinkDAO {
 
     private ArrayList<ShortLinkDTO> shortLinks;
-    private Logger log = Logger.getLogger("ch.masen.compass.ShortLinkDAO");
+    private Logger log = Logger.getLogger("ShortLinkDAO");
     private JedisPool redisPool;
     private String SHORTLINK_PREFIX = "RC.";
 
