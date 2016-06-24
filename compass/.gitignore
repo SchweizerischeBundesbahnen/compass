@@ -1,1 +1,4 @@
-/.idea/
+# IntelliJ ignores
+target/
+.idea/
+*.iml

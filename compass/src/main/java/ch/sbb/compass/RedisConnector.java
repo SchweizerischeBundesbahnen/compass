@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisPool;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class RedisConnector {
     private static JedisPool pool;
 
-    private static Logger log = Logger.getLogger("ch.masen.compass.RedisConnector");
+    private static Logger log = Logger.getLogger("RedisConnector");
 
 
     public static JedisPool getPool() {

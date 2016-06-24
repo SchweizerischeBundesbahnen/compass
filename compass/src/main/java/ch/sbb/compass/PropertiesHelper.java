@@ -1,4 +1,4 @@
-package ch.masen.compass;
+package ch.sbb.compass;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,7 +17,7 @@ public class PropertiesHelper {
     File propertiesFile;
     Properties properties;
 
-    private Logger log = Logger.getLogger("ch.masen.compass.PropertiesHelper");
+    private Logger log = Logger.getLogger("PropertiesHelper");
 
     @Autowired
     public PropertiesHelper(String systemProperty) {
