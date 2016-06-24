@@ -76,7 +76,7 @@
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
-            <id>hosted.mwe-wzu.releases</id>
+            <id>hosted.mwe-wzu.snapshots</id>
             <name>Compass Snapshots</name>
             <url>http://repo.sbb.ch/content/repositories/hosted.mwe-wzu.snapshots/</url>
         </snapshotRepository>
