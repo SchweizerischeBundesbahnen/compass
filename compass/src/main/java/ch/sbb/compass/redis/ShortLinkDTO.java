@@ -1,9 +1,12 @@
-package ch.sbb.compass;
+package ch.sbb.compass.redis;
 
 import java.net.URL;
 
 /**
- * Created by igor on 08.07.15.
+ * The data transfer object for a short link.
+ * 
+ * @author Igor Masen
+ * @since 08.07.15
  */
 public class ShortLinkDTO {
 
@@ -20,16 +23,8 @@ public class ShortLinkDTO {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public URL getDestUrl() {
         return destUrl;
-    }
-
-    public void setDestUrl(URL destUrl) {
-        this.destUrl = destUrl;
     }
 
     public int getRedirectCount() {
