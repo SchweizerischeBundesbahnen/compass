@@ -11,4 +11,4 @@ RUN curl $ARTIFACT_URL -o ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
 
 EXPOSE 8080
 
-CMD java -jar ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar -Dredis.host=${REDIS_HOST}
+CMD java -jar ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar -Dredis.host=${REDIS_HOST} -Xms128m -Xmx512m
