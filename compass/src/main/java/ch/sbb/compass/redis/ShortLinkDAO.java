@@ -42,24 +42,22 @@ public class ShortLinkDAO {
             return;
         }
 
-        Jedis redis = redisPool.getResource();
+        try(Jedis redis = redisPool.getResource()) {
 
-        if (redis.get(shortLink.getId()) != null) {
-            throw new KeyAlreadyExistsException(shortLink.getId());
-        } else {
-            redis.set(shortLink.getId(), shortLink.getDestUrl().toString());
+            if (redis.get(shortLink.getId()) != null) {
+                throw new KeyAlreadyExistsException(shortLink.getId());
+            } else {
+                redis.set(shortLink.getId(), shortLink.getDestUrl().toString());
+            }
+
+            String redirectCounterKey = REDIRECT_COUNTER_PREFIX + shortLink.getId();
+
+            if (redis.get(redirectCounterKey) != null) {
+                throw new KeyAlreadyExistsException(shortLink.getId());
+            } else {
+                redis.set(redirectCounterKey, "0");
+            }
         }
-
-        String redirectCounterKey = REDIRECT_COUNTER_PREFIX + shortLink.getId();
-
-        if (redis.get(redirectCounterKey) != null) {
-            redis.close();
-            throw new KeyAlreadyExistsException(shortLink.getId());
-        } else {
-            redis.set(redirectCounterKey, "0");
-        }
-
-        redis.close();
     }
 
     public Integer getRedirectCounter(ShortLinkDTO shortLink) {
