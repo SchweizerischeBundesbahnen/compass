@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +55,6 @@ public class CreateShortLinkController {
      * @return a JSON response consisting of the parameters <tt>id</tt>, <tt>destUrl</tt> and
      *         <tt>redirectCount</tt>
      */
-    @CrossOrigin // Same origin policy may restrict requests, so allow them all
     @RequestMapping(value = "/rest/1.0/shortlink/create", method = RequestMethod.POST)
     String create(HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException {

@@ -8,7 +8,7 @@ package ch.sbb.compass.util.exception;
  */
 public class KeyAlreadyExistsException extends Exception {
 
-    private static final String unformattedBaseMessage = "Key %s already exists in the database.";
+    private static final String unformattedBaseMessage = "Key '%s' already exists in the database.";
 
     public KeyAlreadyExistsException(String key) {
         super(String.format(unformattedBaseMessage, key));

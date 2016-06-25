@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +35,6 @@ public class DeleteShortLinkController {
      * @param httpServletRequest The request object containing the required parameters
      * @param httpServletResponse The response object to use when an unexpected situation occurs
      */
-    @CrossOrigin
     @RequestMapping(value = "/rest/1.0/shortlink/delete", method = RequestMethod.DELETE)
     void delete(HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException {

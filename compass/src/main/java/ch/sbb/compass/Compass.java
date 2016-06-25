@@ -3,8 +3,11 @@ package ch.sbb.compass;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -26,6 +29,19 @@ public class Compass {
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxTotal(MAX_TOTAL_POOLS);
         return new JedisPool(config, redisHost);
+    }
+
+    /**
+     * @return a WebMvcConfigurer object with a global CORS configuration
+     */
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**"); // map to all paths, allowing all origins
+            }
+        };
     }
 
     /** Starts the spring boot application. */
