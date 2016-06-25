@@ -28,13 +28,12 @@ public class RedirectFromShortLinkController {
     @Autowired
     private ShortLinkDAO shortLinkDAO;
 
-    @RequestMapping(value = "/x/**", method = RequestMethod.GET)
+    @RequestMapping(value = "/**", method = RequestMethod.GET)
     void redirectShortLink(HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException {
 
         Long startTime = System.currentTimeMillis();
-        String requestUri = httpServletRequest.getRequestURI();
-        String redirectKey = requestUri.split("/")[2];
+        String redirectKey = httpServletRequest.getRequestURI().substring(1);
         ShortLinkDTO redirect = shortLinkDAO.getShortLink(redirectKey);
 
         if (redirect != null) {
