@@ -39,7 +39,8 @@ public class Compass {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**"); // map to all paths, allowing all origins
+                // map to all paths, allowing all origins
+                registry.addMapping("/**").allowedMethods("GET","POST","DELETE");
             }
         };
     }
