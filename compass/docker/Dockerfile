@@ -1,4 +1,4 @@
-FROM java
+FROM java:alpine
 
 ENV ARTIFACT_GROUPID ch.sbb
 ENV REPO_ID hosted.mwe-wzu.snapshots
@@ -6,6 +6,9 @@ ENV ARTIFACT_ID compass
 ENV ARTIFACT_VERSION LATEST
 ENV ARTIFACT_URL http://repo.sbb.ch/service/local/artifact/maven/content?r=${REPO_ID}&g=${ARTIFACT_GROUPID}&a=${ARTIFACT_ID}&v=LATEST
 ENV REDIS_HOST localhost
+
+RUN apk add --update curl && \
+    rm -rf /var/cache/apk/*
 
 RUN curl $ARTIFACT_URL -o ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
 
