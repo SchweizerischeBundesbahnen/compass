@@ -10,7 +10,7 @@ RUN apk add --update git && \
 
 RUN git clone https://github.com/SchweizerischeBundesbahnen/compass.git
 
-RUN cd compass && mvn clean install
+RUN cd compass && git checkout master && mvn clean install
 
 EXPOSE 8080
 
