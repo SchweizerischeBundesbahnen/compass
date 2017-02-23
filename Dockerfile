@@ -1,6 +1,10 @@
 FROM maven:alpine
 
+ENV redist_host redis
+ENV JAVA_OPTS -Xms128m -Xmx512m
 ENV branch ${SOURCE_BRANCH}
+
+RUN env
 
 RUN apk add --update git && \
     rm -rf /var/cache/apk/*
@@ -11,4 +15,4 @@ RUN cd compass && git checkout -b ${SOURCE_BRANCH} && mvn clean install
 
 EXPOSE 8080
 
-CMD java -jar ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar -Dredis.host=${REDIS_HOST} -Xms128m -Xmx512m
+CMD java -jar -Dredis.host=${redis_host} ${JAVA_OPTS} 
