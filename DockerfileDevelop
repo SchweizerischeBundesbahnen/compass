@@ -2,7 +2,6 @@ FROM maven:alpine
 
 ENV redist_host redis
 ENV JAVA_OPTS -Xms128m -Xmx512m
-ENV branch ${SOURCE_BRANCH}
 
 RUN env
 
@@ -11,7 +10,7 @@ RUN apk add --update git && \
 
 RUN git clone https://github.com/SchweizerischeBundesbahnen/compass.git
 
-RUN cd compass && git checkout -b ${SOURCE_BRANCH} && mvn clean install
+RUN cd compass && git checkout -b develop && mvn clean install
 
 EXPOSE 8080
 

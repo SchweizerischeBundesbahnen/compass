@@ -1,0 +1,17 @@
+FROM maven:alpine
+
+ENV redist_host redis
+ENV JAVA_OPTS -Xms128m -Xmx512m
+
+RUN env
+
+RUN apk add --update git && \
+    rm -rf /var/cache/apk/*
+
+RUN git clone https://github.com/SchweizerischeBundesbahnen/compass.git
+
+RUN cd compass && mvn clean install
+
+EXPOSE 8080
+
+CMD java -jar -Dredis.host=${redis_host} ${JAVA_OPTS} 
