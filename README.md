@@ -1,4 +1,8 @@
 # compass - Backend for managing Short-Links
+## Build Status
+
+Master-Branch: [![Build Status](https://travis-ci.org/SchweizerischeBundesbahnen/compass.svg?branch=master)](https://travis-ci.org/SchweizerischeBundesbahnen/compass)
+Develop-Branch: [![Build Status](https://travis-ci.org/SchweizerischeBundesbahnen/compass.svg?branch=develop)](https://travis-ci.org/SchweizerischeBundesbahnen/compass)
 
 How to run
 ----------
