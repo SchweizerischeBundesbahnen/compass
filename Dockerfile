@@ -2,6 +2,9 @@ FROM maven:alpine
 
 ENV branch ${SOURCE_BRANCH}
 
+RUN apk add --update git && \
+    rm -rf /var/cache/apk/*
+
 RUN git clone https://github.com/SchweizerischeBundesbahnen/compass.git
 
 RUN cd compass && git checkout -b ${SOURCE_BRANCH} && mvn clean install
