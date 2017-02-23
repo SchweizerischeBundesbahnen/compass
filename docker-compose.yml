@@ -1,0 +1,13 @@
+compass:
+  image: docker.io/schweizerischebundesbahnen/compass
+  ports:
+    - 80:8080
+  restart: always
+  links:
+    - redis 
+
+redis:
+  image: redis:alpine 
+  volumes:
+   - compass-redis-data:/data
+  restart: always
