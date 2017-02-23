@@ -2,9 +2,9 @@ FROM maven:alpine
 
 ENV branch ${SOURCE_BRANCH}
 
-ONBUILD git clone https://github.com/SchweizerischeBundesbahnen/compass.git
+RUN git clone https://github.com/SchweizerischeBundesbahnen/compass.git
 
-ONBUILD cd compass && git checkout -b ${SOURCE_BRANCH} && mvn clean install
+RUN cd compass && git checkout -b ${SOURCE_BRANCH} && mvn clean install
 
 EXPOSE 8080
 
